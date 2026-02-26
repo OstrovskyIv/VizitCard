@@ -4,15 +4,17 @@ import AuroraBackground from './components/AuroraBackground.vue';
 import ShinyText from './components/ShinyText.vue';
 
 const currentLang = ref<'ru' | 'en'>('en');
-const isHeaderDimmed = ref(false);
+const isHeaderHidden = ref(false);
 let hideTimer: ReturnType<typeof setTimeout> | null = null;
 
+// 1. ЛОГИКА УМНОГО МЕНЮ
 const resetTimer = () => {
-  isHeaderDimmed.value = false;
+  isHeaderHidden.value = false;
   if (hideTimer) clearTimeout(hideTimer);
+
   if (window.innerWidth < 768) {
     hideTimer = setTimeout(() => {
-      isHeaderDimmed.value = true;
+      isHeaderHidden.value = true;
     }, 5000);
   }
 };
@@ -29,20 +31,21 @@ onUnmounted(() => {
   window.removeEventListener('touchstart', resetTimer);
 });
 
+// 2. ДАННЫЕ И ПЕРЕВОДЫ
 const t = {
   ru: {
     aboutHeader: "О МОЁМ ПУТИ",
     stackHeader: "ТЕХНОЛОГИИ",
     toolsHeader: "ИНСТРУМЕНТАРИЙ",
     projectsHeader: "ПРОЕКТЫ",
-    bio: "Специализируюсь на создании масштабируемых веб-приложений с использованием Vue 3 и TypeScript. Мой подход базируется на архитектуре FSD. Опыт 1.5+ года. Участвовал в разработке трейдинг-ботов, RP-проектов и e-commerce систем. Владею как фронтенд, так и базовыми бэкенд технологиями (Java, Python, Go).",
+    bio: "Специализируюсь на создании масштабируемых веб-приложений с использованием Vue 3 и TypeScript. Мой подход базируется на архитектуре FSD. Опыт 1.5+ года. Участвовал в разработке трейдинг-ботов, RP-проектов и e-commerce систем. Владею фронтенд и бэкенд технологиями (Java, Python, Go).",
     nav: ["Home", "About", "Stack", "Work"],
     footer: "Адски хороший код — 2025",
     projects: [
       { title: "Trading Mini App", desc: "Главный фронтенд-разработчик трейдинг бота. Сложные графики и real-time данные.", tags: ["Vue 3", "Trading", "WebSockets"], link: "https://github.com/GodSpeedsT/telegram-trading-mini-app" },
       { title: "Last Zone RP", desc: "Разработка уникальных интерфейсов для RolePlay проекта в сеттинге выживания.", tags: ["UI/UX", "Game Design"], link: "https://github.com/OstrovskyIv/Last-Zone-RP" },
-      { title: "Web Shopping Store", desc: "Полноценный интернет-магазин с корзиной и каталогом товаров.", tags: ["E-commerce", "Vue", "State"], link: "https://github.com/OstrovskyIv/web_shopping_store.git" },
-      { title: "Travel Map", desc: "Интерактивная карта путешествий для отслеживания маршрутов и локаций.", tags: ["Leaflet", "Maps", "TS"], link: "https://github.com/OstrovskyIv/TravelMap.git" }
+      { title: "Web Shopping Store", desc: "Интернет-магазин с корзиной и каталогом товаров.", tags: ["E-commerce", "Vue", "State"], link: "https://github.com/OstrovskyIv/web_shopping_store.git" },
+      { title: "Travel Map", desc: "Интерактивная карта путешествий для отслеживания маршрутов.", tags: ["Leaflet", "Maps", "TS"], link: "https://github.com/OstrovskyIv/TravelMap.git" }
     ]
   },
   en: {
@@ -50,7 +53,7 @@ const t = {
     stackHeader: "TECH STACK",
     toolsHeader: "TOOLS",
     projectsHeader: "FEATURED WORK",
-    bio: "Specializing in building scalable web applications with Vue 3 and TypeScript. My approach is based on FSD architecture. 1.5+ years of experience. Involved in developing trading bots, RP projects, and e-commerce systems. Proficient in both frontend and basic backend (Java, Python, Go).",
+    bio: "Specializing in building scalable web applications with Vue 3 and TypeScript. My approach is based on FSD architecture. 1.5+ years of experience. Involved in developing trading bots, RP projects, and e-commerce systems. Proficient in both frontend and backend (Java, Python, Go).",
     nav: ["Home", "About", "Stack", "Work"],
     footer: "Devilishly good code — 2025",
     projects: [
@@ -82,7 +85,7 @@ const languages = [
   { name: 'Go', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original-wordmark.svg', stars: 1 },
 ];
 
-const tools = [
+const toolsList = [
   { name: 'WebStorm', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/webstorm/webstorm-original.svg' },
   { name: 'VS Code', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg' },
   { name: 'Figma', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg' },
@@ -106,8 +109,11 @@ const tools = [
            }"></div>
     </div>
 
-    <header :class="['fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex items-center justify-center transition-all duration-1000', isHeaderDimmed ? 'opacity-20 scale-90 blur-[2px]' : 'opacity-100 scale-100']">
-      <div class="flex items-center gap-x-3 md:gap-x-6 px-5 md:px-8 py-3 bg-zinc-900/90 border border-white/10 rounded-full shadow-2xl backdrop-blur-md pointer-events-auto">
+    <!-- НАВИГАЦИЯ -->
+    <header :class="['fixed top-0 left-1/2 -translate-x-1/2 z-[100] w-full flex flex-col items-center pt-6 transition-all duration-700 pointer-events-none',
+                     isHeaderHidden ? '-translate-y-[85%]' : 'translate-y-0']">
+
+      <div class="flex items-center gap-x-3 md:gap-x-6 px-5 md:px-8 py-3 bg-zinc-900/95 border border-white/10 rounded-full shadow-2xl backdrop-blur-md pointer-events-auto">
         <nav class="flex gap-x-3 md:gap-x-6">
           <button v-for="(item, i) in content.nav" :key="item"
                   @click="scrollTo(sectionIds[i] || 'home')"
@@ -121,8 +127,14 @@ const tools = [
           {{ currentLang === 'ru' ? 'EN' : 'RU' }}
         </button>
       </div>
+
+      <!-- Ярлык-триггер (виден, когда панель скрыта) -->
+      <button v-if="isHeaderHidden" @click="resetTimer"
+              class="mt-4 w-12 h-1.5 bg-red-600/60 rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] pointer-events-auto md:hidden">
+      </button>
     </header>
 
+    <!-- БЛОКИ КОНТЕНТА -->
     <section id="home" class="min-h-screen w-full snap-start flex flex-col items-center justify-center relative overflow-hidden p-6 text-center">
       <AuroraBackground />
       <Transition name="language-fade" mode="out-in">
@@ -177,7 +189,7 @@ const tools = [
         <div class="flex flex-col gap-y-8 md:gap-y-12 border-t border-white/5 pt-12 md:pt-16">
           <h2 class="text-2xl md:text-5xl font-black text-white opacity-10 tracking-[0.3em] uppercase text-center">{{ content.toolsHeader }}</h2>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-8 justify-center max-w-4xl mx-auto w-full px-4">
-            <div v-for="tool in tools" :key="tool.name"
+            <div v-for="tool in toolsList" :key="tool.name"
                  class="group relative bg-zinc-900/30 border border-white/5 rounded-[24px] p-6 md:p-8 flex flex-col items-center gap-y-4 hover:bg-zinc-800 hover:border-white/20 transition-all duration-500">
               <img :src="tool.img" class="w-10 h-10 md:w-14 md:h-14 group-hover:rotate-[25deg] transition-transform" :alt="tool.name">
               <span class="text-[8px] md:text-[10px] font-bold tracking-widest text-white opacity-30 group-hover:opacity-100 uppercase text-center">{{ tool.name }}</span>
@@ -188,13 +200,13 @@ const tools = [
     </section>
 
     <section id="projects" class="min-h-screen w-full snap-start flex flex-col items-center justify-center p-8 md:p-12 bg-[#08080a] z-10 relative">
-      <div class="flex flex-col gap-y-12 md:gap-y-16 w-full max-w-7xl">
+      <div class="flex flex-col gap-y-12 md:gap-y-16 w-full max-w-7xl px-4">
         <Transition name="language-fade" mode="out-in">
           <h2 :key="currentLang" class="text-3xl md:text-7xl font-black text-white opacity-10 tracking-[0.2em] uppercase text-center">
             {{ content.projectsHeader }}
           </h2>
         </Transition>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
           <TransitionGroup name="language-fade">
             <a v-for="p in content.projects" :key="p.title + currentLang" :href="p.link" target="_blank"
                class="group bg-zinc-900/40 border border-white/5 p-8 md:p-12 rounded-[32px] hover:bg-zinc-900 hover:border-red-600/50 transition-all duration-500 relative overflow-hidden flex flex-col gap-y-6">
@@ -215,7 +227,6 @@ const tools = [
       <p class="text-white/5 font-mono text-[9px] tracking-[1em] uppercase">{{ content.footer }}</p>
     </footer>
 
-    <!-- ШУМ (Вынесли стили в CSS класс ниже) -->
     <div class="noise-overlay" />
   </div>
 </template>
@@ -225,7 +236,7 @@ body { margin: 0; background: #050505; -webkit-font-smoothing: antialiased; -moz
 ::-webkit-scrollbar { display: none; }
 .snap-start { scroll-snap-align: start; scroll-snap-stop: always; }
 
-/* Исправленный шум без ошибок линтера */
+/* ИСПРАВЛЕННЫЙ ШУМ */
 .noise-overlay {
   position: fixed;
   inset: 0;
@@ -233,12 +244,12 @@ body { margin: 0; background: #050505; -webkit-font-smoothing: antialiased; -moz
   z-index: 5;
   opacity: 0.03;
   background-image: url('https://grainy-gradients.vercel.app/noise.svg');
+  /* Стандартный синтаксис для WebStorm */
+  mask-image: linear-gradient(to bottom, #000, #000);
 }
 
 /* АНИМАЦИИ ПЕРЕВОДА */
-.language-fade-enter-active, .language-fade-leave-active {
-  transition: opacity 0.4s ease, filter 0.4s ease, transform 0.4s ease;
-}
+.language-fade-enter-active, .language-fade-leave-active { transition: opacity 0.4s ease, filter 0.4s ease, transform 0.4s ease; }
 .language-fade-enter-from { opacity: 0; filter: blur(10px); transform: translateY(5px); }
 .language-fade-leave-to { opacity: 0; filter: blur(10px); transform: translateY(-5px); }
 
