@@ -1,31 +1,48 @@
-# 💼 Digital Business Card
+# VizitCard
 
-An elegant, responsive and concise digital business card to showcase my information.
+This template should help get you started developing with Vue 3 in Vite.
 
- <!--![Screenshot of the Website](screenshot.png) добавить скриншот потом  -->
+## Recommended IDE Setup
 
-## ✨ Features
+[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
 
-- **Responsive Design** - Perfectly adapted for desktop, tablet and mobile devices
-- **Type-Safe Development** - Built with TypeScript for reliable code
-- **Modern UI** - Styled with Tailwind CSS for clean and contemporary design
-- **Vue.js Framework** - Developed using Vue.js for component-based architecture
+## Recommended Browser Setup
 
-## 🚀 Live Demo
+- Chromium-based browsers (Chrome, Edge, Brave, etc.):
+  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
+  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
+- Firefox:
+  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
+  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
 
-Visit the live website:  
-👉 [https://username.github.io/My-business-card](https://username.github.io/My-business-card) <!-- Добавить рабочую ссылку -->
+## Type Support for `.vue` Imports in TS
 
-## 🛠️ Tech Stack
+TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
 
-- **Frontend**: Vue.js, TypeScript
-- **Styling**: Tailwind CSS
-- **Build Tool**: Vue CLI / Vite (*укажите тот, который используете*)
+## Customize configuration
 
-## 📝 Code Structure
+See [Vite Configuration Reference](https://vite.dev/config/).
 
-The source code is organized with clear comment blocks to easily identify and navigate between different components and sections of the website.
+## Project Setup
 
----
+```sh
+npm install
+```
 
-*Last updated: [20.10.2025]*
+### Compile and Hot-Reload for Development
+
+```sh
+npm run dev
+```
+
+### Type-Check, Compile and Minify for Production
+
+```sh
+npm run build
+```
+
+### Lint with [ESLint](https://eslint.org/)
+
+```sh
+npm run lint
+```
