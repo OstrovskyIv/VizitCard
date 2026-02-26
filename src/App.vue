@@ -7,12 +7,9 @@ const currentLang = ref<'ru' | 'en'>('en');
 const isHeaderDimmed = ref(false);
 let hideTimer: ReturnType<typeof setTimeout> | null = null;
 
-// 1. ЛОГИКА УМНОГО МЕНЮ (ТОЛЬКО ДЛЯ МОБИЛОК)
 const resetTimer = () => {
   isHeaderDimmed.value = false;
   if (hideTimer) clearTimeout(hideTimer);
-
-  // Если это мобилка (экран < 768px), запускаем таймер на 5 сек
   if (window.innerWidth < 768) {
     hideTimer = setTimeout(() => {
       isHeaderDimmed.value = true;
@@ -22,16 +19,16 @@ const resetTimer = () => {
 
 onMounted(() => {
   resetTimer();
-  window.addEventListener('scroll', resetTimer);
-  window.addEventListener('touchstart', resetTimer);
+  window.addEventListener('scroll', resetTimer, { passive: true });
+  window.addEventListener('touchstart', resetTimer, { passive: true });
 });
 
 onUnmounted(() => {
+  if (hideTimer) clearTimeout(hideTimer);
   window.removeEventListener('scroll', resetTimer);
   window.removeEventListener('touchstart', resetTimer);
 });
 
-// 2. ПЕРЕВОДЫ
 const t = {
   ru: {
     aboutHeader: "О МОЁМ ПУТИ",
@@ -42,7 +39,7 @@ const t = {
     nav: ["Home", "About", "Stack", "Work"],
     footer: "Адски хороший код — 2025",
     projects: [
-      { title: "Trading Mini App", desc: "Главный фронтенд-разработчик трейдинг бота. Сложные графики и real-time данные.", tags: ["Vue 3", "Trading", "WebSockets"], link: "https://github.com/OstrovskyIv/telegram-trading-mini-app.git" },
+      { title: "Trading Mini App", desc: "Главный фронтенд-разработчик трейдинг бота. Сложные графики и real-time данные.", tags: ["Vue 3", "Trading", "WebSockets"], link: "https://github.com/GodSpeedsT/telegram-trading-mini-app" },
       { title: "Last Zone RP", desc: "Разработка уникальных интерфейсов для RolePlay проекта в сеттинге выживания.", tags: ["UI/UX", "Game Design"], link: "https://github.com/OstrovskyIv/Last-Zone-RP" },
       { title: "Web Shopping Store", desc: "Полноценный интернет-магазин с корзиной и каталогом товаров.", tags: ["E-commerce", "Vue", "State"], link: "https://github.com/OstrovskyIv/web_shopping_store.git" },
       { title: "Travel Map", desc: "Интерактивная карта путешествий для отслеживания маршрутов и локаций.", tags: ["Leaflet", "Maps", "TS"], link: "https://github.com/OstrovskyIv/TravelMap.git" }
@@ -57,7 +54,7 @@ const t = {
     nav: ["Home", "About", "Stack", "Work"],
     footer: "Devilishly good code — 2025",
     projects: [
-      { title: "Trading Mini App", desc: "Lead Frontend Developer for a trading bot. Complex charts and real-time data.", tags: ["Vue 3", "Trading", "WebSockets"], link: "https://github.com/OstrovskyIv/telegram-trading-mini-app.git" },
+      { title: "Trading Mini App", desc: "Lead Frontend Developer for a trading bot. Complex charts and real-time data.", tags: ["Vue 3", "Trading", "WebSockets"], link: "https://github.com/GodSpeedsT/telegram-trading-mini-app" },
       { title: "Last Zone RP", desc: "Developing unique interfaces for a survival-themed RolePlay project.", tags: ["UI/UX", "Game Design"], link: "https://github.com/OstrovskyIv/Last-Zone-RP" },
       { title: "Web Shopping Store", desc: "Full-featured online store with a shopping cart and product catalog.", tags: ["E-commerce", "Vue", "State"], link: "https://github.com/OstrovskyIv/web_shopping_store.git" },
       { title: "Travel Map", desc: "Interactive travel map for tracking routes and locations.", tags: ["Leaflet", "Maps", "TS"], link: "https://github.com/OstrovskyIv/TravelMap.git" }
@@ -73,10 +70,9 @@ const scrollTo = (id: string) => {
   if (element) element.scrollIntoView({ behavior: 'smooth' });
 };
 
-// 3. СТЕК (Рейтинги обновлены)
 const languages = [
   { name: 'Vue.js', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg', stars: 3 },
-  { name: 'TypeScript', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg', stars: 2 }, // Обновлено
+  { name: 'TypeScript', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg', stars: 2 },
   { name: 'Tailwind', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg', stars: 3 },
   { name: 'HTML5', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg', stars: 3 },
   { name: 'CSS3', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg', stars: 3 },
@@ -97,7 +93,6 @@ const tools = [
 <template>
   <div class="h-screen overflow-y-scroll snap-y snap-mandatory bg-[#050505] text-white scroll-smooth relative">
 
-    <!-- ФОН: КАПЛИ И ПУЛЬСАЦИЯ -->
     <div class="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle,rgba(60,0,0,0.15)_0%,transparent_70%)] animate-pulse-slow"></div>
       <div v-for="n in 8" :key="n" class="lava-drop"
@@ -111,7 +106,6 @@ const tools = [
            }"></div>
     </div>
 
-    <!-- НАВИГАЦИЯ (С УМНЫМ СКРЫТИЕМ) -->
     <header :class="['fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex items-center justify-center transition-all duration-1000', isHeaderDimmed ? 'opacity-20 scale-90 blur-[2px]' : 'opacity-100 scale-100']">
       <div class="flex items-center gap-x-3 md:gap-x-6 px-5 md:px-8 py-3 bg-zinc-900/90 border border-white/10 rounded-full shadow-2xl backdrop-blur-md pointer-events-auto">
         <nav class="flex gap-x-3 md:gap-x-6">
@@ -123,13 +117,12 @@ const tools = [
         </nav>
         <div class="w-[1px] h-4 bg-white/10" />
         <button @click="currentLang = currentLang === 'ru' ? 'en' : 'ru'"
-                class="text-[10px] md:text-xs font-black text-red-600 hover:text-white uppercase px-1">
+                class="text-[10px] md:text-xs font-black text-red-600 hover:text-white uppercase px-1 transition-colors">
           {{ currentLang === 'ru' ? 'EN' : 'RU' }}
         </button>
       </div>
     </header>
 
-    <!-- 1. HOME -->
     <section id="home" class="min-h-screen w-full snap-start flex flex-col items-center justify-center relative overflow-hidden p-6 text-center">
       <AuroraBackground />
       <Transition name="language-fade" mode="out-in">
@@ -137,12 +130,11 @@ const tools = [
           <h1 class="text-3xl sm:text-6xl md:text-8xl lg:text-[110px] font-black tracking-tighter uppercase text-white leading-tight">
             <ShinyText :text="currentLang === 'ru' ? 'ИВАН ОСТРОВСКИЙ' : 'IVAN OSTROVSKY'" :speed="4" />
           </h1>
-          <p class="text-red-700 font-mono text-[10px] md:text-sm tracking-[0.4em] md:tracking-[1.2em] uppercase animate-pulse">Front-end developer</p>
+          <p class="text-red-700 font-mono text-[10px] md:text-sm tracking-[1.2em] uppercase animate-pulse">Front-end developer</p>
         </div>
       </Transition>
     </section>
 
-    <!-- 2. ABOUT -->
     <section id="about" class="min-h-screen w-full snap-start flex items-center justify-center p-6 md:p-12 lg:p-24 bg-[#08080a] z-10 relative overflow-hidden">
       <div class="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-y-12 lg:gap-x-20 items-center">
         <Transition name="language-fade" mode="out-in">
@@ -166,8 +158,7 @@ const tools = [
       </div>
     </section>
 
-    <!-- 3. STACK -->
-    <section id="stack" class="min-h-screen w-full snap-start flex flex-col items-center justify-center p-6 md:p-12 bg-[#050505] z-10 relative">
+    <section id="stack" class="min-h-screen w-full snap-start flex flex-col items-center justify-center p-6 md:p-12 bg-[#050505] z-10 relative overflow-y-auto">
       <div class="flex flex-col gap-y-12 md:gap-y-16 w-full max-w-7xl px-4">
         <div class="flex flex-col gap-y-8 md:gap-y-12">
           <h2 class="text-2xl md:text-5xl font-black text-white opacity-10 tracking-[0.3em] uppercase text-center">{{ content.stackHeader }}</h2>
@@ -196,7 +187,6 @@ const tools = [
       </div>
     </section>
 
-    <!-- 4. PROJECTS -->
     <section id="projects" class="min-h-screen w-full snap-start flex flex-col items-center justify-center p-8 md:p-12 bg-[#08080a] z-10 relative">
       <div class="flex flex-col gap-y-12 md:gap-y-16 w-full max-w-7xl">
         <Transition name="language-fade" mode="out-in">
@@ -225,26 +215,27 @@ const tools = [
       <p class="text-white/5 font-mono text-[9px] tracking-[1em] uppercase">{{ content.footer }}</p>
     </footer>
 
-    <div class="fixed inset-0 pointer-events-none z-[5] opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" style="-webkit-mask-image: linear-gradient(black, black);" />
+    <!-- ШУМ (Вынесли стили в CSS класс ниже) -->
+    <div class="noise-overlay" />
   </div>
 </template>
 
 <style>
-body {
-  margin: 0;
-  background: #050505;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
+body { margin: 0; background: #050505; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 ::-webkit-scrollbar { display: none; }
+.snap-start { scroll-snap-align: start; scroll-snap-stop: always; }
 
-.snap-start {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
+/* Исправленный шум без ошибок линтера */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.03;
+  background-image: url('https://grainy-gradients.vercel.app/noise.svg');
 }
 
-/* АНИМАЦИЯ ПЕРЕВОДА */
+/* АНИМАЦИИ ПЕРЕВОДА */
 .language-fade-enter-active, .language-fade-leave-active {
   transition: opacity 0.4s ease, filter 0.4s ease, transform 0.4s ease;
 }
@@ -252,34 +243,16 @@ body {
 .language-fade-leave-to { opacity: 0; filter: blur(10px); transform: translateY(-5px); }
 
 /* ЛАВА */
-.lava-drop {
-  position: absolute;
-  bottom: -250px;
-  border-radius: 50%;
-  filter: blur(60px);
-  animation: float-lava linear infinite;
-  opacity: 0;
-  will-change: transform, opacity;
-}
-
+.lava-drop { position: absolute; bottom: -250px; border-radius: 50%; filter: blur(60px); animation: float-lava linear infinite; opacity: 0; will-change: transform, opacity; }
 @keyframes float-lava {
   0% { transform: translateY(0) scale(1); opacity: 0; }
   15% { opacity: 0.4; }
   50% { transform: translateY(-60vh) scale(1.3); opacity: 0.2; }
-  85% { opacity: 0.4; }
-  100% { transform: translateY(-130vh) scale(0.8); opacity: 0; }
+  100% { transform: translateY(-130vh); opacity: 0; }
 }
-
-@keyframes pulse-slow {
-  0%, 100% { transform: scale(1) translate(-50%, -50%); opacity: 0.6; }
-  50% { transform: scale(1.1) translate(-50%, -50%); opacity: 1; }
-}
-
+@keyframes pulse-slow { 0%, 100% { transform: scale(1) translate(-50%, -50%); opacity: 0.6; } 50% { transform: scale(1.1) translate(-50%, -50%); opacity: 1; } }
 .animate-pulse-slow { animation: pulse-slow 8s ease-in-out infinite; }
-
 .card-float-wrapper { animation: float-card 8s ease-in-out infinite; }
 @keyframes float-card { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-20px) rotate(1deg); } }
-
-/* Убираем стандартные марджины */
 * { margin: 0; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
 </style>
