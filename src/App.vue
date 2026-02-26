@@ -7,7 +7,6 @@ const currentLang = ref<'ru' | 'en'>('en');
 const isHeaderHidden = ref(false);
 let hideTimer: ReturnType<typeof setTimeout> | null = null;
 
-// 1. ЛОГИКА УМНОГО МЕНЮ
 const resetTimer = () => {
   isHeaderHidden.value = false;
   if (hideTimer) clearTimeout(hideTimer);
@@ -31,7 +30,6 @@ onUnmounted(() => {
   window.removeEventListener('touchstart', resetTimer);
 });
 
-// 2. ДАННЫЕ И ПЕРЕВОДЫ
 const t = {
   ru: {
     aboutHeader: "О МОЁМ ПУТИ",
@@ -109,7 +107,6 @@ const toolsList = [
            }"></div>
     </div>
 
-    <!-- НАВИГАЦИЯ -->
     <header :class="['fixed top-0 left-1/2 -translate-x-1/2 z-[100] w-full flex flex-col items-center pt-6 transition-all duration-700 pointer-events-none',
                      isHeaderHidden ? '-translate-y-[85%]' : 'translate-y-0']">
 
@@ -128,13 +125,11 @@ const toolsList = [
         </button>
       </div>
 
-      <!-- Ярлык-триггер (виден, когда панель скрыта) -->
       <button v-if="isHeaderHidden" @click="resetTimer"
               class="mt-4 w-12 h-1.5 bg-red-600/60 rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] pointer-events-auto md:hidden">
       </button>
     </header>
 
-    <!-- БЛОКИ КОНТЕНТА -->
     <section id="home" class="min-h-screen w-full snap-start flex flex-col items-center justify-center relative overflow-hidden p-6 text-center">
       <AuroraBackground />
       <Transition name="language-fade" mode="out-in">
@@ -236,7 +231,6 @@ body { margin: 0; background: #050505; -webkit-font-smoothing: antialiased; -moz
 ::-webkit-scrollbar { display: none; }
 .snap-start { scroll-snap-align: start; scroll-snap-stop: always; }
 
-/* ИСПРАВЛЕННЫЙ ШУМ */
 .noise-overlay {
   position: fixed;
   inset: 0;
@@ -244,11 +238,9 @@ body { margin: 0; background: #050505; -webkit-font-smoothing: antialiased; -moz
   z-index: 5;
   opacity: 0.03;
   background-image: url('https://grainy-gradients.vercel.app/noise.svg');
-  /* Стандартный синтаксис для WebStorm */
   mask-image: linear-gradient(to bottom, #000, #000);
 }
 
-/* АНИМАЦИИ ПЕРЕВОДА */
 .language-fade-enter-active, .language-fade-leave-active { transition: opacity 0.4s ease, filter 0.4s ease, transform 0.4s ease; }
 .language-fade-enter-from { opacity: 0; filter: blur(10px); transform: translateY(5px); }
 .language-fade-leave-to { opacity: 0; filter: blur(10px); transform: translateY(-5px); }
