@@ -1,11 +1,37 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import AuroraBackground from './components/AuroraBackground.vue';
 import ShinyText from './components/ShinyText.vue';
 
 const currentLang = ref<'ru' | 'en'>('en');
+const isHeaderDimmed = ref(false);
+let hideTimer: ReturnType<typeof setTimeout> | null = null;
 
-// 1. ПОЛНЫЕ ПЕРЕВОДЫ (ВКЛЮЧАЯ ПРОЕКТЫ)
+// 1. ЛОГИКА УМНОГО МЕНЮ (ТОЛЬКО ДЛЯ МОБИЛОК)
+const resetTimer = () => {
+  isHeaderDimmed.value = false;
+  if (hideTimer) clearTimeout(hideTimer);
+
+  // Если это мобилка (экран < 768px), запускаем таймер на 5 сек
+  if (window.innerWidth < 768) {
+    hideTimer = setTimeout(() => {
+      isHeaderDimmed.value = true;
+    }, 5000);
+  }
+};
+
+onMounted(() => {
+  resetTimer();
+  window.addEventListener('scroll', resetTimer);
+  window.addEventListener('touchstart', resetTimer);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', resetTimer);
+  window.removeEventListener('touchstart', resetTimer);
+});
+
+// 2. ПЕРЕВОДЫ
 const t = {
   ru: {
     aboutHeader: "О МОЁМ ПУТИ",
@@ -47,10 +73,10 @@ const scrollTo = (id: string) => {
   if (element) element.scrollIntoView({ behavior: 'smooth' });
 };
 
-// 2. РАЗДЕЛЕННЫЙ СТЕК
+// 3. СТЕК (Рейтинги обновлены)
 const languages = [
   { name: 'Vue.js', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg', stars: 3 },
-  { name: 'TypeScript', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg', stars: 3 },
+  { name: 'TypeScript', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg', stars: 2 }, // Обновлено
   { name: 'Tailwind', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg', stars: 3 },
   { name: 'HTML5', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg', stars: 3 },
   { name: 'CSS3', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg', stars: 3 },
@@ -71,7 +97,7 @@ const tools = [
 <template>
   <div class="h-screen overflow-y-scroll snap-y snap-mandatory bg-[#050505] text-white scroll-smooth relative">
 
-    <!-- ЖИВОЙ ФОН -->
+    <!-- ФОН: КАПЛИ И ПУЛЬСАЦИЯ -->
     <div class="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle,rgba(60,0,0,0.15)_0%,transparent_70%)] animate-pulse-slow"></div>
       <div v-for="n in 8" :key="n" class="lava-drop"
@@ -85,8 +111,8 @@ const tools = [
            }"></div>
     </div>
 
-    <!-- НАВИГАЦИЯ -->
-    <header class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex items-center justify-center pointer-events-none">
+    <!-- НАВИГАЦИЯ (С УМНЫМ СКРЫТИЕМ) -->
+    <header :class="['fixed top-6 left-1/2 -translate-x-1/2 z-[100] flex items-center justify-center transition-all duration-1000', isHeaderDimmed ? 'opacity-20 scale-90 blur-[2px]' : 'opacity-100 scale-100']">
       <div class="flex items-center gap-x-3 md:gap-x-6 px-5 md:px-8 py-3 bg-zinc-900/90 border border-white/10 rounded-full shadow-2xl backdrop-blur-md pointer-events-auto">
         <nav class="flex gap-x-3 md:gap-x-6">
           <button v-for="(item, i) in content.nav" :key="item"
@@ -111,7 +137,7 @@ const tools = [
           <h1 class="text-3xl sm:text-6xl md:text-8xl lg:text-[110px] font-black tracking-tighter uppercase text-white leading-tight">
             <ShinyText :text="currentLang === 'ru' ? 'ИВАН ОСТРОВСКИЙ' : 'IVAN OSTROVSKY'" :speed="4" />
           </h1>
-          <p class="text-red-700 font-mono text-[10px] md:text-sm tracking-[1.2em] uppercase animate-pulse">Front-end developer</p>
+          <p class="text-red-700 font-mono text-[10px] md:text-sm tracking-[0.4em] md:tracking-[1.2em] uppercase animate-pulse">Front-end developer</p>
         </div>
       </Transition>
     </section>
@@ -141,10 +167,8 @@ const tools = [
     </section>
 
     <!-- 3. STACK -->
-    <section id="stack" class="min-h-screen w-full snap-start flex flex-col items-center justify-center p-6 md:p-12 bg-[#050505] z-10 relative overflow-y-auto">
-      <div class="flex flex-col gap-y-12 md:gap-y-16 w-full max-w-7xl">
-
-        <!-- LANGUAGES BLOCK -->
+    <section id="stack" class="min-h-screen w-full snap-start flex flex-col items-center justify-center p-6 md:p-12 bg-[#050505] z-10 relative">
+      <div class="flex flex-col gap-y-12 md:gap-y-16 w-full max-w-7xl px-4">
         <div class="flex flex-col gap-y-8 md:gap-y-12">
           <h2 class="text-2xl md:text-5xl font-black text-white opacity-10 tracking-[0.3em] uppercase text-center">{{ content.stackHeader }}</h2>
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
@@ -159,18 +183,16 @@ const tools = [
           </div>
         </div>
 
-        <!-- TOOLS BLOCK -->
         <div class="flex flex-col gap-y-8 md:gap-y-12 border-t border-white/5 pt-12 md:pt-16">
           <h2 class="text-2xl md:text-5xl font-black text-white opacity-10 tracking-[0.3em] uppercase text-center">{{ content.toolsHeader }}</h2>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-8 justify-center max-w-4xl mx-auto w-full">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-8 justify-center max-w-4xl mx-auto w-full px-4">
             <div v-for="tool in tools" :key="tool.name"
                  class="group relative bg-zinc-900/30 border border-white/5 rounded-[24px] p-6 md:p-8 flex flex-col items-center gap-y-4 hover:bg-zinc-800 hover:border-white/20 transition-all duration-500">
-              <img :src="tool.img" class="w-10 h-10 md:w-14 md:h-14 group-hover:rotate-12 transition-transform" :alt="tool.name">
+              <img :src="tool.img" class="w-10 h-10 md:w-14 md:h-14 group-hover:rotate-[25deg] transition-transform" :alt="tool.name">
               <span class="text-[8px] md:text-[10px] font-bold tracking-widest text-white opacity-30 group-hover:opacity-100 uppercase text-center">{{ tool.name }}</span>
             </div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -182,11 +204,11 @@ const tools = [
             {{ content.projectsHeader }}
           </h2>
         </Transition>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 px-4">
           <TransitionGroup name="language-fade">
             <a v-for="p in content.projects" :key="p.title + currentLang" :href="p.link" target="_blank"
                class="group bg-zinc-900/40 border border-white/5 p-8 md:p-12 rounded-[32px] hover:bg-zinc-900 hover:border-red-600/50 transition-all duration-500 relative overflow-hidden flex flex-col gap-y-6">
-              <div class="flex flex-col gap-y-4 relative z-10">
+              <div class="flex flex-col gap-y-4 relative z-10 text-left">
                 <h3 class="text-xl md:text-4xl font-bold text-white uppercase group-hover:text-red-500 transition-colors tracking-tight">{{ p.title }}</h3>
                 <p class="text-gray-400 text-sm md:text-xl font-light leading-relaxed">{{ p.desc }}</p>
                 <div class="flex flex-wrap gap-3">
@@ -203,7 +225,6 @@ const tools = [
       <p class="text-white/5 font-mono text-[9px] tracking-[1em] uppercase">{{ content.footer }}</p>
     </footer>
 
-    <!-- КРОССБРАУЗЕРНЫЙ ШУМ -->
     <div class="fixed inset-0 pointer-events-none z-[5] opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" style="-webkit-mask-image: linear-gradient(black, black);" />
   </div>
 </template>
@@ -259,5 +280,6 @@ body {
 .card-float-wrapper { animation: float-card 8s ease-in-out infinite; }
 @keyframes float-card { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-20px) rotate(1deg); } }
 
+/* Убираем стандартные марджины */
 * { margin: 0; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
 </style>
