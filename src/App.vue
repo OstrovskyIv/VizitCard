@@ -14,7 +14,7 @@ const resetTimer = () => {
   if (window.innerWidth < 768) {
     hideTimer = setTimeout(() => {
       isHeaderHidden.value = true;
-    }, 1000);
+    }, 2000);
   }
 };
 
