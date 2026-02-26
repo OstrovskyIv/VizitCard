@@ -7,24 +7,23 @@ const currentLang = ref<'ru' | 'en'>('en');
 const isHeaderHidden = ref(false);
 let hideTimer: ReturnType<typeof setTimeout> | null = null;
 
-const lavaBlobs = Array.from({ length: 15 }).map((_, i) => ({
+// 1. ОПТИМИЗИРОВАННАЯ ЛАВА (Меньше шаров, темнее цвета)
+const lavaBlobs = Array.from({ length: 8 }).map((_, i) => ({
   id: i,
   left: Math.random() * 100,
-  size: 150 + Math.random() * 250,
-  duration: 12 + Math.random() * 18,
-  delay: Math.random() * -20,
-  opacity: 0.05 + Math.random() * 0.15,
-  color: i % 3 === 0 ? '#660000' : (i % 3 === 1 ? '#220000' : '#440000')
+  size: 300 + Math.random() * 300, // Делаем их больше, чтобы заполнить фон
+  duration: 20 + Math.random() * 15, // Медленнее = плавнее
+  delay: Math.random() * -30,
+  opacity: 0.03 + Math.random() * 0.05, // Почти прозрачные, чтобы не слепили
+  // Глубокие темные оттенки
+  color: i % 2 === 0 ? 'rgba(40, 0, 0, 1)' : 'rgba(20, 0, 0, 1)'
 }));
 
 const resetTimer = () => {
   isHeaderHidden.value = false;
   if (hideTimer) clearTimeout(hideTimer);
-
   if (window.innerWidth < 768) {
-    hideTimer = setTimeout(() => {
-      isHeaderHidden.value = true;
-    }, 3000);
+    hideTimer = setTimeout(() => { isHeaderHidden.value = true; }, 3000);
   }
 };
 
@@ -49,7 +48,7 @@ const t = {
       { title: "Trading Mini App", desc: "Главный фронтенд-разработчик трейдинг бота. Сложные графики и real-time данные.", tags: ["Vue 3", "Trading", "WebSockets"], link: "https://github.com/GodSpeedsT/telegram-trading-mini-app" },
       { title: "Last Zone RP", desc: "Разработка уникальных интерфейсов для RolePlay проекта в сеттинге выживания.", tags: ["UI/UX", "Game Design"], link: "https://github.com/OstrovskyIv/Last-Zone-RP" },
       { title: "Web Shopping Store", desc: "Интернет-магазин с корзиной и каталогом товаров.", tags: ["E-commerce", "Vue", "State"], link: "https://github.com/OstrovskyIv/web_shopping_store.git" },
-      { title: "Travel Map", desc: "Интерактивная карта путешествий для отслеживания маршрутов и локаций.", tags: ["Leaflet", "Maps", "TS"], link: "https://github.com/OstrovskyIv/TravelMap.git" }
+      { title: "Travel Map", desc: "Интерактивная карта путешествий для отслеживания маршрутов.", tags: ["Leaflet", "Maps", "TS"], link: "https://github.com/OstrovskyIv/TravelMap.git" }
     ]
   },
   en: {
@@ -92,9 +91,12 @@ const toolsList = [
 <template>
   <div class="h-screen overflow-y-scroll snap-y snap-mandatory bg-[#050505] text-white scroll-smooth relative">
 
+    <!-- ОПТИМИЗИРОВАННЫЙ ТЕМНЫЙ ФОН -->
     <div class="fixed inset-0 pointer-events-none z-[1] overflow-hidden bg-black">
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle,rgba(40,0,0,0.15)_0%,transparent_80%)] animate-pulse-slow"></div>
+      <!-- Медленное пульсирующее свечение -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle,rgba(40,0,0,0.08)_0%,transparent_85%)] animate-pulse-slow"></div>
 
+      <!-- Шары лавы на чистых градиентах (без blur для скорости) -->
       <div v-for="blob in lavaBlobs" :key="blob.id"
            class="lava-blob"
            :style="{
@@ -109,6 +111,7 @@ const toolsList = [
       </div>
     </div>
 
+    <!-- НАВИГАЦИЯ -->
     <header :class="['fixed top-0 left-1/2 -translate-x-1/2 z-[100] w-full flex flex-col items-center pt-6 transition-all duration-700 pointer-events-none', isHeaderHidden ? '-translate-y-[85%]' : 'translate-y-0']">
       <div class="flex items-center gap-x-3 md:gap-x-6 px-5 md:px-8 py-3 bg-zinc-900/95 border border-white/10 rounded-full shadow-2xl backdrop-blur-md pointer-events-auto">
         <nav class="flex gap-x-3 md:gap-x-6">
@@ -121,6 +124,7 @@ const toolsList = [
       <button v-if="isHeaderHidden" @click="resetTimer" class="mt-4 w-12 h-1.5 bg-red-600/60 rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] pointer-events-auto md:hidden"></button>
     </header>
 
+    <!-- 1. HOME -->
     <section id="home" class="min-h-screen w-full snap-start flex flex-col items-center justify-center relative overflow-hidden p-6 text-center">
       <AuroraBackground />
       <Transition name="language-fade" mode="out-in">
@@ -133,6 +137,7 @@ const toolsList = [
       </Transition>
     </section>
 
+    <!-- 2. ABOUT -->
     <section id="about" class="min-h-screen w-full snap-start flex items-center justify-center p-6 md:p-12 lg:p-24 bg-[#08080a]/40 z-10 relative overflow-hidden">
       <div class="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-y-12 lg:gap-x-20 items-center">
         <Transition name="language-fade" mode="out-in">
@@ -152,6 +157,7 @@ const toolsList = [
       </div>
     </section>
 
+    <!-- 3. STACK -->
     <section id="stack" class="min-h-screen w-full snap-start flex flex-col items-center justify-center p-6 md:p-12 bg-[#050505]/40 z-10 relative overflow-y-auto">
       <div class="flex flex-col gap-y-12 md:gap-y-16 w-full max-w-7xl px-4 py-20">
         <div class="flex flex-col gap-y-8 md:gap-y-12">
@@ -176,6 +182,7 @@ const toolsList = [
       </div>
     </section>
 
+    <!-- 4. PROJECTS -->
     <section id="projects" class="min-h-screen w-full snap-start flex flex-col items-center justify-center p-8 md:p-12 bg-[#08080a]/40 z-10 relative">
       <div class="flex flex-col gap-y-12 md:gap-y-16 w-full max-w-7xl px-4 py-20">
         <Transition name="language-fade" mode="out-in"><h2 :key="currentLang" class="text-3xl md:text-7xl font-black text-white opacity-10 tracking-[0.2em] uppercase text-center">{{ content.projectsHeader }}</h2></Transition>
@@ -197,6 +204,7 @@ const toolsList = [
       <p class="text-white/5 font-mono text-[9px] tracking-[1em] uppercase">{{ content.footer }}</p>
     </footer>
 
+    <!-- ШУМ (ИСПРАВЛЕННЫЙ) -->
     <div class="noise-overlay" />
   </div>
 </template>
@@ -210,32 +218,36 @@ body { margin: 0; background: #050505; -webkit-font-smoothing: antialiased; -moz
   position: fixed; inset: 0; pointer-events: none; z-index: 5; opacity: 0.03;
   background-image: url('https://grainy-gradients.vercel.app/noise.svg');
   mask-image: linear-gradient(to bottom, #000, #000);
+  -webkit-mask-image: linear-gradient(to bottom, #000, #000);
 }
 
 .language-fade-enter-active, .language-fade-leave-active { transition: opacity 0.4s ease, filter 0.4s ease, transform 0.4s ease; }
 .language-fade-enter-from { opacity: 0; filter: blur(10px); transform: translateY(5px); }
 .language-fade-leave-to { opacity: 0; filter: blur(10px); transform: translateY(-5px); }
 
+/* ЛАВА - ОПТИМИЗИРОВАННАЯ ВЕРСИЯ */
 .lava-blob {
   position: absolute;
-  bottom: -300px;
+  bottom: -350px;
   border-radius: 50%;
-  filter: blur(100px);
+  /* УБРАЛИ blur(80px), заменили на градиент в style */
   animation: lava-float linear infinite;
-  will-change: transform, border-radius, opacity;
+  will-change: transform, opacity;
 }
 
 @keyframes lava-float {
-  0% { transform: translateY(0) scale(1) translateX(0); opacity: 0; border-radius: 50%; }
-  10% { opacity: 1; }
-  50% { transform: translateY(-60vh) scale(1.4) translateX(40px); border-radius: 40% 60% 50% 50%; }
-  90% { opacity: 1; }
-  100% { transform: translateY(-130vh) scale(0.9) translateX(-20px); opacity: 0; border-radius: 50%; }
+  0% { transform: translateY(0) scale(1) translateX(0); opacity: 0; }
+  15% { opacity: 1; }
+  50% { transform: translateY(-60vh) scale(1.3) translateX(30px); }
+  85% { opacity: 1; }
+  100% { transform: translateY(-130vh) scale(0.8) translateX(-20px); opacity: 0; }
 }
 
-@keyframes pulse-slow { 0%, 100% { transform: scale(1) translate(-50%, -50%); opacity: 0.4; } 50% { transform: scale(1.1) translate(-50%, -50%); opacity: 0.7; } }
-.animate-pulse-slow { animation: pulse-slow 8s ease-in-out infinite; }
+@keyframes pulse-slow { 0%, 100% { transform: scale(1) translate(-50%, -50%); opacity: 0.4; } 50% { transform: scale(1.05) translate(-50%, -50%); opacity: 0.6; } }
+.animate-pulse-slow { animation: pulse-slow 10s ease-in-out infinite; }
+
 .card-float-wrapper { animation: float-card 8s ease-in-out infinite; }
-@keyframes float-card { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-20px) rotate(1deg); } }
+@keyframes float-card { 0%, 100% { transform: translateY(0) rotate(-0.5deg); } 50% { transform: translateY(-15px) rotate(0.5deg); } }
+
 * { margin: 0; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
 </style>
