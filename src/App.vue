@@ -7,23 +7,14 @@ const currentLang = ref<'ru' | 'en'>('en');
 const isHeaderHidden = ref(false);
 let hideTimer: ReturnType<typeof setTimeout> | null = null;
 
-// 1. ОПТИМИЗИРОВАННАЯ ЛАВА (Меньше шаров, темнее цвета)
-const lavaBlobs = Array.from({ length: 8 }).map((_, i) => ({
-  id: i,
-  left: Math.random() * 100,
-  size: 300 + Math.random() * 300, // Делаем их больше, чтобы заполнить фон
-  duration: 20 + Math.random() * 15, // Медленнее = плавнее
-  delay: Math.random() * -30,
-  opacity: 0.03 + Math.random() * 0.05, // Почти прозрачные, чтобы не слепили
-  // Глубокие темные оттенки
-  color: i % 2 === 0 ? 'rgba(40, 0, 0, 1)' : 'rgba(20, 0, 0, 1)'
-}));
-
 const resetTimer = () => {
   isHeaderHidden.value = false;
   if (hideTimer) clearTimeout(hideTimer);
+
   if (window.innerWidth < 768) {
-    hideTimer = setTimeout(() => { isHeaderHidden.value = true; }, 3000);
+    hideTimer = setTimeout(() => {
+      isHeaderHidden.value = true;
+    }, 1000);
   }
 };
 
@@ -66,7 +57,19 @@ const t = {
 
 const content = computed(() => t[currentLang.value]);
 const sectionIds: string[] = ['home', 'about', 'stack', 'projects'];
-const scrollTo = (id: string) => { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); };
+const scrollTo = (id: string | undefined) => {
+  if (id) document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+};
+
+const lavaBlobs = Array.from({ length: 8 }).map((_, i) => ({
+  id: i,
+  left: Math.random() * 100,
+  size: 300 + Math.random() * 300,
+  duration: 20 + Math.random() * 15,
+  delay: Math.random() * -30,
+  opacity: 0.04 + Math.random() * 0.04,
+  color: i % 2 === 0 ? 'rgba(50, 0, 0, 1)' : 'rgba(30, 0, 0, 1)'
+}));
 
 const languages = [
   { name: 'Vue.js', img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg', stars: 3 },
@@ -91,12 +94,8 @@ const toolsList = [
 <template>
   <div class="h-screen overflow-y-scroll snap-y snap-mandatory bg-[#050505] text-white scroll-smooth relative">
 
-    <!-- ОПТИМИЗИРОВАННЫЙ ТЕМНЫЙ ФОН -->
     <div class="fixed inset-0 pointer-events-none z-[1] overflow-hidden bg-black">
-      <!-- Медленное пульсирующее свечение -->
       <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle,rgba(40,0,0,0.08)_0%,transparent_85%)] animate-pulse-slow"></div>
-
-      <!-- Шары лавы на чистых градиентах (без blur для скорости) -->
       <div v-for="blob in lavaBlobs" :key="blob.id"
            class="lava-blob"
            :style="{
@@ -111,11 +110,10 @@ const toolsList = [
       </div>
     </div>
 
-    <!-- НАВИГАЦИЯ -->
     <header :class="['fixed top-0 left-1/2 -translate-x-1/2 z-[100] w-full flex flex-col items-center pt-6 transition-all duration-700 pointer-events-none', isHeaderHidden ? '-translate-y-[85%]' : 'translate-y-0']">
       <div class="flex items-center gap-x-3 md:gap-x-6 px-5 md:px-8 py-3 bg-zinc-900/95 border border-white/10 rounded-full shadow-2xl backdrop-blur-md pointer-events-auto">
         <nav class="flex gap-x-3 md:gap-x-6">
-          <button v-for="(item, i) in content.nav" :key="item" @click="scrollTo(sectionIds[i] || 'home')"
+          <button v-for="(item, i) in content.nav" :key="item" @click="scrollTo(sectionIds[i])"
                   class="text-[10px] md:text-xs font-black text-gray-500 hover:text-white transition-all active:scale-95 uppercase">{{ item }}</button>
         </nav>
         <div class="w-[1px] h-4 bg-white/10" />
@@ -124,7 +122,6 @@ const toolsList = [
       <button v-if="isHeaderHidden" @click="resetTimer" class="mt-4 w-12 h-1.5 bg-red-600/60 rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] pointer-events-auto md:hidden"></button>
     </header>
 
-    <!-- 1. HOME -->
     <section id="home" class="min-h-screen w-full snap-start flex flex-col items-center justify-center relative overflow-hidden p-6 text-center">
       <AuroraBackground />
       <Transition name="language-fade" mode="out-in">
@@ -137,7 +134,6 @@ const toolsList = [
       </Transition>
     </section>
 
-    <!-- 2. ABOUT -->
     <section id="about" class="min-h-screen w-full snap-start flex items-center justify-center p-6 md:p-12 lg:p-24 bg-[#08080a]/40 z-10 relative overflow-hidden">
       <div class="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-y-12 lg:gap-x-20 items-center">
         <Transition name="language-fade" mode="out-in">
@@ -157,35 +153,33 @@ const toolsList = [
       </div>
     </section>
 
-    <!-- 3. STACK -->
     <section id="stack" class="min-h-screen w-full snap-start flex flex-col items-center justify-center p-6 md:p-12 bg-[#050505]/40 z-10 relative overflow-y-auto">
-      <div class="flex flex-col gap-y-12 md:gap-y-16 w-full max-w-7xl px-4 py-20">
-        <div class="flex flex-col gap-y-8 md:gap-y-12">
-          <h2 class="text-2xl md:text-5xl font-black text-white opacity-10 tracking-[0.3em] uppercase text-center">{{ content.stackHeader }}</h2>
+      <div class="flex flex-col gap-y-12 md:gap-y-16 w-full max-w-7xl px-4 py-20 text-center">
+        <div class="flex flex-col gap-y-12">
+          <h2 class="text-2xl md:text-5xl font-black text-white opacity-10 tracking-[0.3em] uppercase">{{ content.stackHeader }}</h2>
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
             <div v-for="skill in languages" :key="skill.name" class="group relative bg-zinc-900/50 border border-white/5 rounded-[24px] p-6 md:p-8 flex flex-col items-center gap-y-4 hover:bg-zinc-800 hover:border-red-600/50 transition-all duration-500 overflow-hidden">
               <div class="absolute top-2 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity"><span v-for="s in skill.stars" :key="s" class="text-red-600 text-[10px]">★</span></div>
               <img :src="skill.img" class="w-10 h-10 md:w-14 md:h-14 group-hover:scale-110 transition-all" :alt="skill.name">
-              <span class="text-[8px] md:text-[10px] font-bold tracking-widest text-white opacity-40 group-hover:opacity-100 uppercase text-center">{{ skill.name }}</span>
+              <span class="text-[8px] md:text-[10px] font-bold tracking-widest text-white opacity-40 group-hover:opacity-100 uppercase">{{ skill.name }}</span>
             </div>
           </div>
         </div>
-        <div class="flex flex-col gap-y-8 md:gap-y-12 border-t border-white/5 pt-12 md:pt-16">
-          <h2 class="text-2xl md:text-5xl font-black text-white opacity-10 tracking-[0.3em] uppercase text-center">{{ content.toolsHeader }}</h2>
+        <div class="flex flex-col gap-y-12 border-t border-white/5 pt-12 md:pt-16">
+          <h2 class="text-2xl md:text-5xl font-black text-white opacity-10 tracking-[0.3em] uppercase">{{ content.toolsHeader }}</h2>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-8 justify-center max-w-4xl mx-auto w-full px-4">
             <div v-for="tool in toolsList" :key="tool.name" class="group relative bg-zinc-900/30 border border-white/5 rounded-[24px] p-6 md:p-8 flex flex-col items-center gap-y-4 hover:bg-zinc-800 hover:border-white/20 transition-all duration-500">
               <img :src="tool.img" class="w-10 h-10 md:w-14 md:h-14 group-hover:rotate-[25deg] transition-transform" :alt="tool.name">
-              <span class="text-[8px] md:text-[10px] font-bold tracking-widest text-white opacity-30 group-hover:opacity-100 uppercase text-center">{{ tool.name }}</span>
+              <span class="text-[8px] md:text-[10px] font-bold tracking-widest text-white opacity-30 group-hover:opacity-100 uppercase">{{ tool.name }}</span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 4. PROJECTS -->
     <section id="projects" class="min-h-screen w-full snap-start flex flex-col items-center justify-center p-8 md:p-12 bg-[#08080a]/40 z-10 relative">
-      <div class="flex flex-col gap-y-12 md:gap-y-16 w-full max-w-7xl px-4 py-20">
-        <Transition name="language-fade" mode="out-in"><h2 :key="currentLang" class="text-3xl md:text-7xl font-black text-white opacity-10 tracking-[0.2em] uppercase text-center">{{ content.projectsHeader }}</h2></Transition>
+      <div class="flex flex-col gap-y-12 md:gap-y-16 w-full max-w-7xl px-4 py-20 text-center">
+        <Transition name="language-fade" mode="out-in"><h2 :key="currentLang" class="text-3xl md:text-7xl font-black text-white opacity-10 tracking-[0.2em] uppercase">{{ content.projectsHeader }}</h2></Transition>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
           <TransitionGroup name="language-fade">
             <a v-for="p in content.projects" :key="p.title + currentLang" :href="p.link" target="_blank" class="group bg-zinc-900/40 border border-white/5 p-8 md:p-12 rounded-[32px] hover:bg-zinc-900 hover:border-red-600/50 transition-all duration-500 relative overflow-hidden flex flex-col gap-y-6">
@@ -204,7 +198,6 @@ const toolsList = [
       <p class="text-white/5 font-mono text-[9px] tracking-[1em] uppercase">{{ content.footer }}</p>
     </footer>
 
-    <!-- ШУМ (ИСПРАВЛЕННЫЙ) -->
     <div class="noise-overlay" />
   </div>
 </template>
@@ -217,24 +210,13 @@ body { margin: 0; background: #050505; -webkit-font-smoothing: antialiased; -moz
 .noise-overlay {
   position: fixed; inset: 0; pointer-events: none; z-index: 5; opacity: 0.03;
   background-image: url('https://grainy-gradients.vercel.app/noise.svg');
-  mask-image: linear-gradient(to bottom, #000, #000);
-  -webkit-mask-image: linear-gradient(to bottom, #000, #000);
 }
 
 .language-fade-enter-active, .language-fade-leave-active { transition: opacity 0.4s ease, filter 0.4s ease, transform 0.4s ease; }
 .language-fade-enter-from { opacity: 0; filter: blur(10px); transform: translateY(5px); }
 .language-fade-leave-to { opacity: 0; filter: blur(10px); transform: translateY(-5px); }
 
-/* ЛАВА - ОПТИМИЗИРОВАННАЯ ВЕРСИЯ */
-.lava-blob {
-  position: absolute;
-  bottom: -350px;
-  border-radius: 50%;
-  /* УБРАЛИ blur(80px), заменили на градиент в style */
-  animation: lava-float linear infinite;
-  will-change: transform, opacity;
-}
-
+.lava-blob { position: absolute; bottom: -350px; border-radius: 50%; animation: lava-float linear infinite; will-change: transform, opacity; }
 @keyframes lava-float {
   0% { transform: translateY(0) scale(1) translateX(0); opacity: 0; }
   15% { opacity: 1; }
@@ -244,10 +226,8 @@ body { margin: 0; background: #050505; -webkit-font-smoothing: antialiased; -moz
 }
 
 @keyframes pulse-slow { 0%, 100% { transform: scale(1) translate(-50%, -50%); opacity: 0.4; } 50% { transform: scale(1.05) translate(-50%, -50%); opacity: 0.6; } }
-.animate-pulse-slow { animation: pulse-slow 10s ease-in-out infinite; }
-
+.animate-pulse-slow { animation: pulse-slow 8s ease-in-out infinite; }
 .card-float-wrapper { animation: float-card 8s ease-in-out infinite; }
-@keyframes float-card { 0%, 100% { transform: translateY(0) rotate(-0.5deg); } 50% { transform: translateY(-15px) rotate(0.5deg); } }
-
+@keyframes float-card { 0%, 100% { transform: translateY(0) rotate(-0.5deg); } 50% { transform: translateY(-20px) rotate(0.5deg); } }
 * { margin: 0; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
 </style>
