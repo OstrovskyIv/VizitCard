@@ -121,7 +121,7 @@ const toolsList = [
       </div>
       <button v-if="isHeaderHidden" @click="resetTimer" class="mt-4 w-12 h-1.5 bg-red-600/60 rounded-full animate-pulse shadow-[0_0_15px_rgba(220,38,38,0.6)] pointer-events-auto md:hidden"></button>
     </header>
-
+ <!-- Добавить больше логотипов-->
     <section id="home" class="min-h-screen w-full snap-start flex flex-col items-center justify-center relative overflow-hidden p-6 text-center">
       <AuroraBackground />
       <Transition name="language-fade" mode="out-in">
