@@ -9,11 +9,11 @@ const props = defineProps({
   },
   delay: {
     type: Number,
-    default: 150 // задержка между словами в мс
+    default: 150
   },
   animateBy: {
     type: String,
-    default: 'words' // можно выбрать 'words' (слова) или 'letters' (буквы)
+    default: 'words'
   },
   className: {
     type: String,
@@ -26,14 +26,11 @@ const root = ref<HTMLElement | null>(null);
 onMounted(() => {
   if (!root.value) return;
 
-  // Находим все элементы для анимации (слова или буквы)
   const elements = root.value.querySelectorAll('.blur-item');
 
-  // Настраиваем наблюдатель появления на экране
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
-        // Запускаем GSAP анимацию
         gsap.fromTo(elements,
           {
             filter: 'blur(10px)',
@@ -49,7 +46,6 @@ onMounted(() => {
             ease: 'power3.out',
           }
         );
-        // Отключаем наблюдение после того, как анимация один раз сработала
         observer.unobserve(entry.target);
       }
     });
@@ -66,12 +62,7 @@ onMounted(() => {
       :key="index"
       class="blur-item inline-block will-change-[transform,filter,opacity]"
     >
-      <!-- Если это пробел в режиме букв, заменяем на неразрывный пробел -->
       {{ item === ' ' ? '\u00A0' : item }}
     </span>
   </div>
 </template>
-
-<style scoped>
-/* Дополнительные стили не требуются, так как всё на Tailwind и GSAP */
-</style>
