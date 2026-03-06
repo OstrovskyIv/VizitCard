@@ -82,12 +82,12 @@ A high-end, interactive "VizitCard" portfolio built with **Vue 3** and **TypeScr
 ## 📸 Screenshots / Скриншоты
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/OstrovskyIv/VizitCard/main/public/screenshots/home.png" width="45%" alt="Home Screen">
-  <img src="https://raw.githubusercontent.com/OstrovskyIv/VizitCard/main/public/screenshots/about.png" width="45%" alt="About Section">
+  <img src="https://raw.githubusercontent.com/OstrovskyIv/VizitCard/main/public/screenshots/home.webp" width="45%" alt="Home Screen">
+  <img src="https://raw.githubusercontent.com/OstrovskyIv/VizitCard/main/public/screenshots/about.webp" width="45%" alt="About Section">
 </p>
 <p align="center">
-  <img src="https://raw.githubusercontent.com/OstrovskyIv/VizitCard/main/public/screenshots/stack.png" width="45%" alt="Tech Stack">
-  <img src="https://raw.githubusercontent.com/OstrovskyIv/VizitCard/main/public/screenshots/work.png" width="45%" alt="Projects">
+  <img src="https://raw.githubusercontent.com/OstrovskyIv/VizitCard/main/public/screenshots/stack.webp" width="45%" alt="Tech Stack">
+  <img src="https://raw.githubusercontent.com/OstrovskyIv/VizitCard/main/public/screenshots/work.webp" width="45%" alt="Projects">
 </p>
 
 ---
