@@ -123,7 +123,6 @@ const toolsList = [
           {{ currentLang === 'ru' ? 'EN' : 'RU' }}
         </button>
 
-        <!-- НОВЫЙ БЛОК С ИКОНКАМИ -->
         <div class="w-[1px] h-4 bg-white/10" />
 
         <div class="flex items-center gap-x-3 md:gap-x-4">
@@ -166,7 +165,8 @@ const toolsList = [
           <div class="card-float-wrapper relative">
             <div class="absolute -inset-6 bg-red-600/10 blur-[60px] rounded-full animate-pulse"></div>
             <div class="relative w-60 h-80 md:w-80 md:h-[480px] bg-zinc-900 border-[10px] border-zinc-800 rounded-[40px] shadow-2xl overflow-hidden group hover:border-red-900/50 transition-all duration-700">
-              <img src="/assets/Me.png" alt="Ivan Photo" class="w-full h-full object-cover grayscale brightness-100 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" />
+              <img src="/assets/Me.webp" alt="Ivan Photo" fetchpriority="high" loading="eager" class="w-full h-full object-cover grayscale brightness-100 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000"
+              />
             </div>
           </div>
         </div>
