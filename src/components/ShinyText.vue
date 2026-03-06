@@ -1,11 +1,13 @@
 <script setup lang="ts">
 defineProps<{ text: string, speed?: number }>();
 </script>
+
 <template>
   <span class="shiny-text" :style="{ animationDuration: (speed || 5) + 's' }">
     {{ text }}
   </span>
 </template>
+
 <style scoped>
 .shiny-text {
   background: linear-gradient(120deg, rgba(255,255,255,0) 40%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 60%);
